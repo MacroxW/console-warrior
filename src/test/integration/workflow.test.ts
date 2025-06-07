@@ -13,7 +13,7 @@ suite('Console Warrior Integration Tests', () => {
         testProjectPath = path.join(workspaceFolder.uri.fsPath, 'projects', 'test-node-project');
 
         // Ensure extension is activated
-        const extension = vscode.extensions.getExtension('macrox.console-warrior');
+        const extension = vscode.extensions.getExtension('MacroxW.console-warrior');
         if (extension && !extension.isActive) {
             await extension.activate();
         }
@@ -23,7 +23,7 @@ suite('Console Warrior Integration Tests', () => {
         this.timeout(10000); // Increase timeout for integration test
 
         // 1. Start Console Warrior monitoring
-        await vscode.commands.executeCommand('console-warrior.start');
+        await vscode.commands.executeCommand('console-warrior.startMonitoring');
 
         // 2. Simulate running the test project (in real scenario this would be done through terminal)
         const logFilePath = path.join(testProjectPath, '.console-warrior-logs.json');
@@ -73,8 +73,8 @@ suite('Console Warrior Integration Tests', () => {
         const parsedLogs = JSON.parse(logContent);
         assert.strictEqual(parsedLogs.length, 3, 'Should have 3 log entries');
 
-        // 8. Stop monitoring
-        await vscode.commands.executeCommand('console-warrior.pause');
+        // 8. Clear logs (instead of pause since there's no pause command)
+        await vscode.commands.executeCommand('console-warrior.clearLogs');
 
         // 9. Cleanup
         if (fs.existsSync(logFilePath)) {
@@ -115,9 +115,9 @@ suite('Console Warrior Integration Tests', () => {
         const commands = await vscode.commands.getCommands(true);
 
         // Test menu-related commands
-        assert.ok(commands.includes('console-warrior.start'), 'Start command should be available');
-        assert.ok(commands.includes('console-warrior.pause'), 'Pause command should be available');
-        assert.ok(commands.includes('console-warrior.showOutput'), 'Show output command should be available');
-        assert.ok(commands.includes('console-warrior.clearOutput'), 'Clear output command should be available');
+        assert.ok(commands.includes('console-warrior.startMonitoring'), 'Start monitoring command should be available');
+        assert.ok(commands.includes('console-warrior.captureLogs'), 'Capture logs command should be available');
+        assert.ok(commands.includes('console-warrior.viewLogs'), 'View logs command should be available');
+        assert.ok(commands.includes('console-warrior.clearLogs'), 'Clear logs command should be available');
     });
 });

@@ -49,14 +49,14 @@ export class TerminalCapture {
         try {
             const stats = fs.statSync(this.logOutputFile);
             const currentModTime = stats.mtime.getTime();
-            
+
             // Check if file has been modified since last read
             if (currentModTime <= this.lastFileModTime) {
                 return;
             }
-            
+
             this.lastFileModTime = currentModTime;
-            
+
             const content = fs.readFileSync(this.logOutputFile, 'utf8');
             if (!content.trim()) {
                 return;

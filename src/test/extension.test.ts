@@ -9,14 +9,14 @@ suite('Console Warrior Extension Test Suite', () => {
 
 	suiteSetup(async () => {
 		// Ensure extension is activated
-		const extension = vscode.extensions.getExtension('macrox.console-warrior');
+		const extension = vscode.extensions.getExtension('MacroxW.console-warrior');
 		if (extension && !extension.isActive) {
 			await extension.activate();
 		}
 	});
 
 	test('Extension should be present and activate', async () => {
-		const extension = vscode.extensions.getExtension('macrox.console-warrior');
+		const extension = vscode.extensions.getExtension('MacroxW.console-warrior');
 		assert.ok(extension);
 		assert.ok(extension?.isActive);
 	});
@@ -25,10 +25,13 @@ suite('Console Warrior Extension Test Suite', () => {
 		const commands = await vscode.commands.getCommands(true);
 
 		const expectedCommands = [
-			'console-warrior.start',
-			'console-warrior.pause',
-			'console-warrior.showOutput',
-			'console-warrior.clearOutput'
+			'console-warrior.startMonitoring',
+			'console-warrior.captureLogs',
+			'console-warrior.clearLogs',
+			'console-warrior.viewLogs',
+			'console-warrior.showLogJson',
+			'console-warrior.copyLogValue',
+			'console-warrior.showLogDetails'
 		];
 
 		expectedCommands.forEach(command => {
@@ -52,7 +55,7 @@ suite('Console Warrior Extension Test Suite', () => {
 	test('Should initialize LogManager correctly', async () => {
 		// Import LogManager
 		const { LogManager } = await import('../logManager.js');
-		
+
 		// Test initialization
 		assert.doesNotThrow(() => {
 			LogManager.initialize();
@@ -62,7 +65,7 @@ suite('Console Warrior Extension Test Suite', () => {
 	test('Should create status bar item', async () => {
 		// Import StatusBarManager
 		const statusBarModule = await import('../statusBar.js');
-		
+
 		// Test status bar creation
 		assert.doesNotThrow(() => {
 			const statusBar = new statusBarModule.StatusBarManager();
@@ -70,21 +73,21 @@ suite('Console Warrior Extension Test Suite', () => {
 		}, 'StatusBarManager should initialize without errors');
 	});
 
-	test('Console Warrior start command should work', async () => {
+	test('Console Warrior start monitoring command should work', async () => {
 		try {
-			await vscode.commands.executeCommand('console-warrior.start');
-			assert.ok(true, 'Start command executed successfully');
+			await vscode.commands.executeCommand('console-warrior.startMonitoring');
+			assert.ok(true, 'Start monitoring command executed successfully');
 		} catch (error) {
-			assert.fail(`Start command failed: ${error}`);
+			assert.fail(`Start monitoring command failed: ${error}`);
 		}
 	});
 
-	test('Console Warrior pause command should work', async () => {
+	test('Console Warrior capture logs command should work', async () => {
 		try {
-			await vscode.commands.executeCommand('console-warrior.pause');
-			assert.ok(true, 'Pause command executed successfully');
+			await vscode.commands.executeCommand('console-warrior.captureLogs');
+			assert.ok(true, 'Capture logs command executed successfully');
 		} catch (error) {
-			assert.fail(`Pause command failed: ${error}`);
+			assert.fail(`Capture logs command failed: ${error}`);
 		}
 	});
 

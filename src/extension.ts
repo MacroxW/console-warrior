@@ -193,6 +193,21 @@ export function activate(context: vscode.ExtensionContext) {
 		await LogManager.captureLogsInCurrentFile();
 	});
 
+	// Command to show log JSON file
+	const showLogJsonDisposable = vscode.commands.registerCommand('console-warrior.showLogJson', async () => {
+		await LogManager.showLogJson();
+	});
+
+	// Command to copy log value from specific line
+	const copyLogValueDisposable = vscode.commands.registerCommand('console-warrior.copyLogValue', async (lineNumber?: string) => {
+		await LogManager.copyLogValue(lineNumber);
+	});
+
+	// Command to show detailed log information
+	const showLogDetailsDisposable = vscode.commands.registerCommand('console-warrior.showLogDetails', async (lineNumber?: string) => {
+		await LogManager.showLogDetails(lineNumber);
+	});
+
 	// Auto-capture logs when opening JavaScript/TypeScript files
 	const onDidOpenTextDocument = vscode.workspace.onDidOpenTextDocument(async (document) => {
 		if ((document.fileName.endsWith('.js') || document.fileName.endsWith('.ts')) && statusBarManager) {
@@ -224,6 +239,9 @@ export function activate(context: vscode.ExtensionContext) {
 		statusBarMenuDisposable,
 		projectMenuDisposable,
 		testDecorationsDisposable,
+		showLogJsonDisposable,
+		copyLogValueDisposable,
+		showLogDetailsDisposable,
 		statusBarManager,
 		onDidOpenTextDocument,
 		onDidChangeActiveEditor

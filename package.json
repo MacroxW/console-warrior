@@ -81,6 +81,21 @@
         "command": "console-warrior.testDecorations",
         "title": "Test Console Warrior Decorations",
         "category": "Console Warrior"
+      },
+      {
+        "command": "console-warrior.showLogJson",
+        "title": "View Complete Log JSON File",
+        "category": "Console Warrior"
+      },
+      {
+        "command": "console-warrior.copyLogValue",
+        "title": "Copy Log Value",
+        "category": "Console Warrior"
+      },
+      {
+        "command": "console-warrior.showLogDetails",
+        "title": "Show Log Details",
+        "category": "Console Warrior"
       }
     ],
     "keybindings": [
@@ -98,8 +113,42 @@
         "command": "console-warrior.statusBarMenu",
         "key": "ctrl+shift+w",
         "when": "editorTextFocus"
+      },
+      {
+        "command": "console-warrior.showLogJson",
+        "key": "ctrl+shift+j",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "console-warrior.copyLogValue",
+        "key": "ctrl+shift+c",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "console-warrior.showLogDetails",
+        "key": "ctrl+shift+d",
+        "when": "editorTextFocus"
       }
     ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "console-warrior.copyLogValue",
+          "when": "editorTextFocus && resourceExtname == '.js'",
+          "group": "consoleWarrior@1"
+        },
+        {
+          "command": "console-warrior.showLogDetails",
+          "when": "editorTextFocus && resourceExtname == '.js'",
+          "group": "consoleWarrior@2"
+        },
+        {
+          "command": "console-warrior.showLogJson",
+          "when": "editorTextFocus && resourceExtname == '.js'",
+          "group": "consoleWarrior@3"
+        }
+      ]
+    },
     "colors": [
       {
         "id": "consoleWarrior.logOutput",

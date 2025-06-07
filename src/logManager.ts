@@ -1,5 +1,6 @@
-import * as vscode from 'vscode';
+import * as fs from 'fs';
 import * as path from 'path';
+import * as vscode from 'vscode';
 import { TerminalCapture } from './utils/terminalCapture';
 
 interface LogEntry {
@@ -18,6 +19,7 @@ export class LogManager {
     private static realTimeLogs: LogEntry[] = [];
     private static fileWatcher: vscode.FileSystemWatcher | undefined;
     private static readonly documentChangeListener: vscode.Disposable[] = [];
+    private static hoverProvider: vscode.Disposable | undefined;
 
     public static initialize(): void {
         this.outputChannel = vscode.window.createOutputChannel('Console Warrior');
@@ -40,6 +42,7 @@ export class LogManager {
         // Setup file watching for source code changes
         this.setupFileWatching();
         this.setupDocumentChangeListening();
+        this.setupHoverProvider();
     }
 
     public static startMonitoring(): void {
@@ -131,6 +134,81 @@ export class LogManager {
         this.documentChangeListener.push(onDidSaveDocument, onDidChangeActiveEditor);
     }
 
+    private static setupHoverProvider(): void {
+        // Register hover provider for JavaScript and TypeScript files
+        this.hoverProvider = vscode.languages.registerHoverProvider(
+            [{ scheme: 'file', language: 'javascript' }, { scheme: 'file', language: 'typescript' }],
+            {
+                provideHover: (document, position) => {
+                    if (!this.isMonitoring) {
+                        return undefined;
+                    }
+
+                    // Check if this position is on a line with a console log decoration
+                    const lineNumber = position.line;
+                    const logEntriesForLine = this.realTimeLogs.filter(log =>
+                        log.lineNumber === lineNumber + 1
+                    );
+
+                    if (logEntriesForLine.length === 0) {
+                        return undefined;
+                    }
+
+                    // Create detailed hover content
+                    const hoverContent = new vscode.MarkdownString();
+                    hoverContent.isTrusted = true;
+                    hoverContent.supportHtml = true;
+
+                    hoverContent.appendMarkdown('## 🥷 Console Warrior Log Details\n\n');
+
+                    logEntriesForLine.forEach((log, index) => {
+                        if (index > 0) {
+                            hoverContent.appendMarkdown('---\n\n');
+                        }
+
+                        hoverContent.appendMarkdown(`**Log #${log.index}** | **${log.type.toUpperCase()}** | \`${log.timestamp.split('T')[1].split('.')[0]}\`\n\n`);
+
+                        // Enhanced message display with JSON preview
+                        let displayMessage = log.message;
+                        let jsonPreview = '';
+
+                        try {
+                            // Try to parse if message contains JSON-like content
+                            if (log.message.includes('{') || log.message.includes('[')) {
+                                const jsonRegex = /(\{.*\}|\[.*\])/;
+                                const jsonMatch = jsonRegex.exec(log.message);
+                                if (jsonMatch) {
+                                    const possibleJson = jsonMatch[1];
+                                    JSON.parse(possibleJson); // Validate JSON
+                                    jsonPreview = '\n\n**JSON Preview:**\n';
+                                    const formatted = JSON.stringify(JSON.parse(possibleJson), null, 2);
+                                    jsonPreview += '```json\n' + formatted + '\n```\n';
+                                }
+                            }
+                        } catch {
+                            // Not valid JSON, continue with regular display
+                        }
+
+                        hoverContent.appendMarkdown(`**Message:** \`${displayMessage}\`${jsonPreview}\n`);
+                    });
+
+                    // Enhanced action buttons
+                    const lineParam = encodeURIComponent(lineNumber.toString());
+                    const copyUri = vscode.Uri.parse(`command:console-warrior.copyLogValue?${lineParam}`);
+                    const detailsUri = vscode.Uri.parse(`command:console-warrior.showLogDetails?${lineParam}`);
+                    const jsonUri = vscode.Uri.parse(`command:console-warrior.showLogJson`);
+
+                    hoverContent.appendMarkdown('\n\n**Quick Actions:**\n\n');
+                    hoverContent.appendMarkdown(`[📋 Copy Value](${copyUri}) | `);
+                    hoverContent.appendMarkdown(`[🔍 View Details](${detailsUri}) | `);
+                    hoverContent.appendMarkdown(`[📄 Full JSON](${jsonUri})`);
+
+                    return new vscode.Hover(hoverContent);
+                }
+            }
+        );
+    }
+
     private static startRealTimeCapture(): void {
         this.realTimeLogs = [];
         console.log('[ConsoleWarrior] startRealTimeCapture called');
@@ -202,6 +280,11 @@ export class LogManager {
             const line = document.lineAt(lineIndex);
             // Combine multiple logs for the same line
             const messages = entries.map(entry => entry.message).join(' | ');
+            const logCount = entries.length;
+            const latestTimestamp = entries[entries.length - 1].timestamp;
+            const timeDisplay = latestTimestamp.split('T')[1].split('.')[0];
+            const countDisplay = logCount > 1 ? ` (${logCount} logs)` : '';
+
             const decoration: vscode.DecorationOptions = {
                 range: new vscode.Range(
                     lineIndex,
@@ -211,14 +294,15 @@ export class LogManager {
                 ),
                 renderOptions: {
                     after: {
-                        contentText: ` 🥷 ${messages}`,
+                        contentText: ` 🥷 ${messages}${countDisplay} [${timeDisplay}]`,
                         color: '#00ff88',
                         backgroundColor: 'rgba(0, 255, 136, 0.1)',
                         border: '1px solid rgba(0, 255, 136, 0.5)',
                         fontWeight: 'bold',
                         margin: '0 0 0 15px'
                     }
-                }
+                },
+                hoverMessage: new vscode.MarkdownString(`**🥷 Console Warrior Log**\n\n**Messages:** ${messages}\n\n**Count:** ${logCount}\n\n**Latest:** ${latestTimestamp}\n\n**💡 Quick Actions:**\n- **Ctrl+Shift+C** - Copy log value\n- **Ctrl+Shift+D** - Show details\n- **Ctrl+Shift+J** - View JSON file\n\n*Click or hover for more options*`)
             };
             decorations.push(decoration);
         });
@@ -238,6 +322,181 @@ export class LogManager {
     public static clearOutput(): void {
         this.outputChannel.clear();
         this.clearAllDecorations();
+    }
+
+    public static async showLogJson(): Promise<void> {
+        const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+        if (!workspaceFolder) {
+            vscode.window.showErrorMessage('No workspace folder found');
+            return;
+        }
+
+        const logFilePath = path.join(
+            workspaceFolder.uri.fsPath,
+            'projects',
+            'test-node-project',
+            '.console-warrior-logs.json'
+        );
+
+        try {
+            // Check if log file exists
+            if (!fs.existsSync(logFilePath)) {
+                vscode.window.showInformationMessage('🟡 No log file found. Run the test project to generate logs.');
+                return;
+            }
+
+            // Read the log file content
+            const content = fs.readFileSync(logFilePath, 'utf8');
+
+            if (!content.trim()) {
+                vscode.window.showInformationMessage('📄 Log file is empty. Run the test project to generate logs.');
+                return;
+            }
+
+            // Parse and format JSON for better readability
+            let formattedContent: string;
+            try {
+                const logs = JSON.parse(content);
+                formattedContent = JSON.stringify(logs, null, 2);
+            } catch (parseError) {
+                // If parsing fails, show raw content
+                console.warn('[ConsoleWarrior] Failed to parse log file as JSON:', parseError);
+                formattedContent = content;
+            }
+
+            // Create a new document with the JSON content
+            const document = await vscode.workspace.openTextDocument({
+                content: formattedContent,
+                language: 'json'
+            });
+
+            await vscode.window.showTextDocument(document, {
+                viewColumn: vscode.ViewColumn.Beside,
+                preview: false
+            });
+
+            vscode.window.showInformationMessage('📄 Console Warrior logs opened in JSON viewer');
+
+        } catch (error) {
+            vscode.window.showErrorMessage(`Error reading log file: ${error}`);
+        }
+    }
+
+    public static async copyLogValue(lineNumber?: string): Promise<void> {
+        try {
+            const line = lineNumber ? parseInt(lineNumber) : vscode.window.activeTextEditor?.selection.active.line;
+            if (line === undefined) {
+                vscode.window.showWarningMessage('No line specified for copying log value');
+                return;
+            }
+
+            const logEntriesForLine = this.realTimeLogs.filter(log =>
+                log.lineNumber === line + 1
+            );
+
+            if (logEntriesForLine.length === 0) {
+                vscode.window.showInformationMessage('No log data found for this line');
+                return;
+            }
+
+            // If multiple logs on same line, copy the latest one
+            const latestLog = logEntriesForLine[logEntriesForLine.length - 1];
+
+            // Try to extract just the value (remove the prefix like "Received data:")
+            let valueToCopy = latestLog.message;
+
+            // Check if message contains JSON-like content
+            if (latestLog.message.includes('{') || latestLog.message.includes('[')) {
+                const jsonRegex = /(\{.*\}|\[.*\])/;
+                const jsonMatch = jsonRegex.exec(latestLog.message);
+                if (jsonMatch) {
+                    try {
+                        const jsonObj = JSON.parse(jsonMatch[1]);
+                        valueToCopy = JSON.stringify(jsonObj, null, 2);
+                    } catch {
+                        // Keep original message if JSON parsing fails
+                    }
+                }
+            }
+
+            await vscode.env.clipboard.writeText(valueToCopy);
+            vscode.window.showInformationMessage(`📋 Copied log value to clipboard: ${valueToCopy.substring(0, 50)}...`);
+
+        } catch (error) {
+            vscode.window.showErrorMessage(`Error copying log value: ${error}`);
+        }
+    }
+
+    public static async showLogDetails(lineNumber?: string): Promise<void> {
+        try {
+            const line = lineNumber ? parseInt(lineNumber) : vscode.window.activeTextEditor?.selection.active.line;
+            if (line === undefined) {
+                vscode.window.showWarningMessage('No line specified for showing log details');
+                return;
+            }
+
+            const logEntriesForLine = this.realTimeLogs.filter(log =>
+                log.lineNumber === line + 1
+            );
+
+            if (logEntriesForLine.length === 0) {
+                vscode.window.showInformationMessage('No log data found for this line');
+                return;
+            }
+
+            // Create detailed view content
+            let detailContent = '# 🥷 Console Warrior - Log Details\n\n';
+            detailContent += `**Line:** ${line + 1}\n`;
+            detailContent += `**Total Logs:** ${logEntriesForLine.length}\n\n`;
+            detailContent += '---\n\n';
+
+            logEntriesForLine.forEach((log, index) => {
+                detailContent += `## Log Entry #${log.index}\n\n`;
+                detailContent += `**Type:** ${log.type}\n`;
+                detailContent += `**Timestamp:** ${log.timestamp}\n`;
+                detailContent += `**Raw Message:** ${log.message}\n\n`;
+
+                // Try to parse and format JSON content
+                if (log.message.includes('{') || log.message.includes('[')) {
+                    const jsonRegex = /(\{.*\}|\[.*\])/;
+                    const jsonMatch = jsonRegex.exec(log.message);
+                    if (jsonMatch) {
+                        try {
+                            const jsonObj = JSON.parse(jsonMatch[1]);
+                            detailContent += '**Formatted JSON:**\n```json\n';
+                            detailContent += JSON.stringify(jsonObj, null, 2);
+                            detailContent += '\n```\n\n';
+                        } catch {
+                            detailContent += '**Note:** JSON parsing failed\n\n';
+                        }
+                    }
+                }
+
+                detailContent += '**Complete Log Object:**\n```json\n';
+                detailContent += JSON.stringify(log, null, 2);
+                detailContent += '\n```\n\n';
+
+                if (index < logEntriesForLine.length - 1) {
+                    detailContent += '---\n\n';
+                }
+            });
+
+            // Create and show document
+            const document = await vscode.workspace.openTextDocument({
+                content: detailContent,
+                language: 'markdown'
+            });
+
+            await vscode.window.showTextDocument(document, {
+                viewColumn: vscode.ViewColumn.Beside,
+                preview: false
+            });
+
+            vscode.window.showInformationMessage(`🔍 Showing details for ${logEntriesForLine.length} log(s) on line ${line + 1}`);
+
+        } catch (error) {
+            vscode.window.showErrorMessage(`Error showing log details: ${error}`);
+        }
     }
 
     public static async captureLogsInCurrentFile(): Promise<void> {
@@ -431,14 +690,20 @@ export class LogManager {
         this.outputChannel.dispose();
         this.decorationType.dispose();
         TerminalCapture.dispose();
-        
+
         // Dispose file watcher
         if (this.fileWatcher) {
             this.fileWatcher.dispose();
             this.fileWatcher = undefined;
         }
-        
+
         // Dispose document change listeners
         this.documentChangeListener.forEach(listener => listener.dispose());
+
+        // Dispose hover provider
+        if (this.hoverProvider) {
+            this.hoverProvider.dispose();
+            this.hoverProvider = undefined;
+        }
     }
 }
