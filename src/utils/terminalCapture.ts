@@ -19,8 +19,6 @@ export class TerminalCapture {
         // Look for the log file in the test project directory
         this.logOutputFile = path.join(
             workspaceFolder,
-            'projects',
-            'test-node-project',
             '.console-warrior-logs.json'
         );
         console.log('[ConsoleWarrior] TerminalCapture logOutputFile:', this.logOutputFile);
