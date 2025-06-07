@@ -1,0 +1,86 @@
+{
+  "name": "helloworld",
+  "displayName": "HelloWorld Text Decorator & Vite Manager",
+  "description": "Add decorative text beside code lines and manage Vite development projects with ease",
+  "version": "1.0.0",
+  "publisher": "MacroxW",
+  "author": {
+    "name": "Marcos Wendy",
+    "email": "wendymarcos2@gmail.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/first-vscode-extension"
+  },
+  "keywords": [
+    "text-decoration",
+    "vite",
+    "development",
+    "productivity",
+    "code-annotation"
+  ],
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "helloworld.helloWorld",
+        "title": "Hello World"
+      },
+      {
+        "command": "helloworld.addTextBeside",
+        "title": "Add Text Beside Code"
+      },
+      {
+        "command": "helloworld.clearTextBeside",
+        "title": "Clear Text Beside Code"
+      },
+      {
+        "command": "helloworld.startVite",
+        "title": "Start Vite Dev Server"
+      },
+      {
+        "command": "helloworld.readViteLogs",
+        "title": "Read Vite Logs"
+      },
+      {
+        "command": "helloworld.captureAndDisplayLogs",
+        "title": "Capture and Display Logs"
+      },
+      {
+        "command": "helloworld.clearLogDecorations",
+        "title": "Clear Log Decorations"
+      },
+      {
+        "command": "helloworld.generateMockLogs",
+        "title": "Generate Mock Logs for Testing"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "yarn compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "yarn compile && yarn lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.100.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@typescript-eslint/eslint-plugin": "^8.31.1",
+    "@typescript-eslint/parser": "^8.31.1",
+    "eslint": "^9.25.1",
+    "typescript": "^5.8.3",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.5.2"
+  }
+}
