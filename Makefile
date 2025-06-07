@@ -2,7 +2,7 @@
 # This Makefile provides convenient commands for developing the HelloWorld extension
 
 # Variables
-EXTENSION_NAME = helloworld
+EXTENSION_NAME = console'warrior
 NODE_MODULES = node_modules
 OUT_DIR = out
 VSIX_FILE = $(EXTENSION_NAME)-*.vsix

@@ -1,75 +1,201 @@
-# HelloWorld VS Code Extension
+# Console Warrior 🥷
 
-A VS Code extension that allows you to add decorative text beside your code lines and manage Vite development projects.
+**Dynamic Logging Made Simple & Free** ⚡
 
-## Features
+A powerful VS Code extension that brings dynamic log visualization directly to your code - like Console Ninja, but completely open source and free! See your `console.log` outputs right beside your code in real-time, without switching between your editor and browser console.
 
-### 🎨 Text Decorations
+> 🎯 **Mission**: Democratize advanced logging tools for every developer, regardless of budget.
 
-- **Add Text Beside Code**: Adds customizable text at the end of any code line
-- **Clear Text Decorations**: Removes all text decorations from the editor
-- Interactive text placement with visual feedback
+## Why Console Warrior?
 
-### 🚀 Vite Project Management  
+- ✅ **100% Free & Open Source** - No subscriptions, no limits
+- 🚀 **Real-time Log Visualization** - See outputs directly in your editor
+- 🎨 **Beautiful UI** - Clean, modern interface with syntax highlighting
+- ⚡ **Zero Configuration** - Works out of the box
+- 🔧 **Extensible** - Built for the community, by the community
 
-- **Start Vite Dev Server**: Launch a Vite development server in a dedicated terminal
-- **Read Vite Logs**: Quick access to Vite terminal logs for debugging
-- Smart terminal management and project path detection
+## ✨ Core Features
 
-### 📊 Log Capture & Display
+### 🎯 Dynamic Log Visualization
 
-- **Capture and Display Logs**: Automatically parse console.log statements and display their output as decorations beside the code
-- **Clear Log Decorations**: Remove all log decorations from the current file
-- **Generate Mock Logs**: Create test log entries for demonstration and testing purposes
-- **Real-time Log Monitoring**: Advanced log tracking with timestamp information
+- **Real-time Console Output** - See `console.log` results directly beside your code
+- **Multi-console Support** - `console.warn`, `console.info`, `console.debug`, and more
+- **Timestamp Tracking** - Know exactly when each log was executed
+- **Smart Log Parsing** - Automatically detects and displays log outputs
 
-### 📁 Welcome File
+### 🎨 Code Enhancement
 
-- Automatic welcome file opening when extension activates
-- Helpful documentation and command reference
+- **Interactive Decorations** - Add custom text beside any code line
+- **Syntax Highlighting** - Beautiful, color-coded log displays
+- **Quick Actions** - Clear decorations with a single command
 
-## Installation
+### 🚀 Development Workflow
+
+- **Vite Integration** - Built-in Vite development server management
+- **Terminal Management** - Smart terminal handling for seamless development
+- **Mock Data Generation** - Create test logs for demonstration and testing
+
+### 📁 Developer Experience
+
+- **Zero Config Setup** - Works immediately after installation
+- **Automatic Welcome Guide** - Get started in seconds
+- **Command Palette Integration** - All features accessible via `Ctrl+Shift+P`
+
+## 🗺️ Roadmap
+
+### 🎯 Core Features (In Development)
+
+- [x] **Console Logs** ✨  
+  Output from `console.log` displayed in your editor next to the relevant line of code. No more context switching to browser dev tools or terminal output.
+
+- [ ] **Runtime Errors** 🚨  
+  Runtime error output displayed in your editor next to the relevant line of code. Catch exceptions and errors exactly where they happen.
+
+- [ ] **Network Requests** 🌐  
+  Network logging captures details of requests made by your browser to your application. Only requests related to files currently opened in your editor are logged. Shows URL, method (GET, POST), and status (200, 404, 500) right next to your code.
+
+### 🔮 Future Enhancements
+
+- [ ] **Enhanced Console Methods** - Support for `console.warn`, `console.info`, `console.debug`
+- [ ] **Log Filtering & Search** - Real-time filtering and search capabilities
+- [ ] **Performance Monitoring** - Track execution times and performance metrics
+- [ ] **WebSocket Support** - Real-time connection monitoring
+- [ ] **Custom Log Formatters** - Personalized output styling
+
+> 🚀 **Current Focus**: Getting the core trio of features rock-solid before expanding!
+
+## 🚀 Quick Start
+
+### One-Click Installation (Coming Soon)
+
+- Install from VS Code Marketplace: `Console Warrior`
+- Press `F5` to see it in action!
 
 ### Development Setup
 
-1. Clone or download this extension project
-2. Install dependencies using Yarn:
+1. **Clone the repository:**
+
+   ```bash
+   git clone https://github.com/yourusername/console-warrior.git
+   cd console-warrior
+   ```
+
+2. **Install dependencies:**
 
    ```bash
    yarn install
    ```
 
-3. Compile the TypeScript source:
+3. **Launch in development mode:**
 
    ```bash
    yarn compile
+   # Press F5 in VS Code to open extension host
    ```
-
-4. Press `F5` to open a new VS Code window with the extension loaded
 
 ### From Source
 
 ```bash
 # Using the provided Makefile
 make install
-make build
+make build  
 make debug
 ```
 
-## Commands
+## 🎬 See It In Action
 
-All commands are available through the Command Palette (`Ctrl+Shift+P` or `Cmd+Shift+P`):
+### Before Console Warrior
 
-| Command | Description |
-|---------|-------------|
-| `Hello World` | Display a simple greeting message |
-| `Add Text Beside Code` | Add decorative text at the end of the current line |
-| `Clear Text Beside Code` | Remove all text decorations from the editor |
-| `Start Vite Dev Server` | Launch Vite development server in terminal |
-| `Read Vite Logs` | Focus on Vite terminal to view logs |
-| `Capture and Display Logs` | Parse console.log statements and show output beside code |
-| `Clear Log Decorations` | Remove all log decorations from the current file |
-| `Generate Mock Logs` | Create test log entries for demonstration |
+```javascript
+console.log('🚀 Loading user data...');
+// Switch to browser console to see: "🚀 Loading user data..."
+// Switch back to editor...
+// Switch to console again...
+// 😤 Constant context switching!
+```
+
+### After Console Warrior ✨
+
+```javascript
+console.log('🚀 Loading user data...'); // → 🚀 Loading user data... [12:34:56.789]
+console.log('✅ User loaded:', user);    // → ✅ User loaded: {name: "John", id: 123} [12:34:56.821]
+console.warn('⚠️ Cache miss');           // → ⚠️ Cache miss [12:34:56.825]
+```
+
+**The magic**: All outputs appear right beside your code, in real-time! 🪄
+
+### Demo Video
+>
+> 🎥 Coming soon: Watch Console Warrior in action!
+
+---
+
+## 🎮 How to Use
+
+### 1. Dynamic Log Visualization
+
+```javascript
+function greetUser(name) {
+    console.log('🚀 Application starting...'); // ← You'll see output here!
+    console.log('👤 User logged in');
+    
+    if (name) {
+        console.log('🎉 Welcome back!');
+        return `Hello, ${name}!`;
+    }
+    
+    console.log('⚠️ No username provided');
+    return 'Hello, Guest!';
+}
+```
+
+**Steps:**
+
+1. Open any JavaScript/TypeScript file with `console.log` statements
+2. Run command: `Ctrl+Shift+P` → "Capture and Display Logs"
+3. Watch the magic happen! ✨
+
+### 2. Custom Text Decorations
+
+1. Place cursor on any line
+2. `Ctrl+Shift+P` → "Add Text Beside Code"  
+3. See decorative text appear instantly
+
+### 3. Vite Project Management
+
+1. `Ctrl+Shift+P` → "Start Vite Dev Server"
+2. Enter your project path
+3. Integrated terminal management with log viewing
+
+## 🆚 Console Warrior vs Alternatives
+
+| Feature | Console Warrior | Console Ninja | Browser DevTools |
+|---------|----------------|---------------|------------------|
+| **Price** | 🆓 **Free Forever** | 💰 Paid subscription | 🆓 Free |
+| **In-Editor Logs** | ✅ Real-time | ✅ Real-time | ❌ Separate window |
+| **Open Source** | ✅ MIT License | ❌ Proprietary | ❌ Browser-specific |
+| **No Setup** | ✅ Zero config | ✅ Easy setup | ⚠️ Manual steps |
+| **Offline Work** | ✅ Always works | ✅ Works offline | ✅ Browser dependent |
+| **Custom Extensions** | ✅ Community driven | ❌ Limited | ❌ No customization |
+| **Multi-Framework** | ✅ Universal | ✅ Multiple | ⚠️ Framework dependent |
+
+**🎯 Our Mission**: Bring Console Ninja's amazing UX to everyone, for free!
+
+## 📋 Available Commands
+
+All commands are accessible through the Command Palette (`Ctrl+Shift+P` or `Cmd+Shift+P`):
+
+| Command | Description | Status |
+|---------|-------------|--------|
+| `Capture and Display Logs` | 🎯 Parse console.log statements and show output beside code | ✅ Active |
+| `Clear Log Decorations` | 🧹 Remove all log decorations from the current file | ✅ Active |
+| `Generate Mock Logs` | 🎭 Create test log entries for demonstration | ✅ Active |
+| `Add Text Beside Code` | ✏️ Add decorative text at the end of the current line | ✅ Active |
+| `Clear Text Beside Code` | 🗑️ Remove all text decorations from the editor | ✅ Active |
+| `Start Vite Dev Server` | 🚀 Launch Vite development server in terminal | ✅ Active |
+| `Read Vite Logs` | 📖 Focus on Vite terminal to view logs | ✅ Active |
+
+> 💡 **Tip**: Most commands work immediately without configuration!
 
 ## Usage
 
@@ -214,34 +340,106 @@ This setup allows you to immediately test:
 - Implemented welcome file system
 - Full Yarn support for development workflow
 
-## Contributing
+## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature-name`
-3. Make your changes and test thoroughly
-4. Commit with descriptive messages: `git commit -m "Add feature description"`
-5. Push to your branch: `git push origin feature-name`
-6. Open a Pull Request
+Console Warrior is built by developers, for developers! We welcome contributions of all kinds.
 
-## License
+### Ways to Contribute
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+- 🐛 **Report bugs** - Found something broken? Let us know!
+- 💡 **Suggest features** - Have ideas for new logging capabilities?
+- 🔧 **Submit PRs** - Code contributions are always welcome
+- 📖 **Improve docs** - Help make the documentation clearer
+- ⭐ **Star the repo** - Show your support!
 
-## Support
+### Development Workflow
 
-For issues, questions, or contributions:
+1. **Fork & Clone**
 
-- Open an issue on the project repository
-- Check existing documentation in the `vsc-extension-quickstart.md` file
-- Review VS Code extension development guidelines
+   ```bash
+   git clone https://github.com/yourusername/console-warrior.git
+   cd console-warrior
+   ```
+
+2. **Create Feature Branch**
+
+   ```bash
+   git checkout -b feature/amazing-new-feature
+   ```
+
+3. **Develop & Test**
+
+   ```bash
+   yarn install
+   yarn compile
+   # Press F5 to test in VS Code Extension Host
+   ```
+
+4. **Submit PR**
+
+   ```bash
+   git commit -m "feat: add amazing new feature"
+   git push origin feature/amazing-new-feature
+   # Open PR on GitHub
+   ```
+
+### 🎯 Good First Issues
+
+Looking for easy ways to contribute? Check out issues labeled:
+
+- `good-first-issue` - Perfect for newcomers
+- `help-wanted` - Community assistance needed
+- `documentation` - Improve our docs
+
+> **Pro tip**: Join our discussions to connect with other contributors!
+
+## 📄 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+**TL;DR**: You can use, modify, and distribute this software freely. We just ask that you include the original license notice.
+
+## 💬 Community & Support
+
+### Get Help
+
+- 📚 **Documentation** - Check our [Wiki](https://github.com/yourusername/console-warrior/wiki)
+- 🐛 **Bug Reports** - [Open an issue](https://github.com/yourusername/console-warrior/issues)
+- 💬 **Discussions** - [Join the conversation](https://github.com/yourusername/console-warrior/discussions)
+- 📧 **Email** - For security issues: <security@console-warrior.dev>
+
+### Follow the Project
+
+- ⭐ **GitHub** - Star us for updates
+- 🐦 **Twitter** - Follow [@ConsoleWarrior](https://twitter.com/consolewarrior)
+- 📝 **Blog** - Read our [development updates](https://console-warrior.dev/blog)
 
 ---
 
-## Resources
+## 🙏 Acknowledgments
 
-- [VS Code Extension API](https://code.visualstudio.com/api)
-- [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-- [Yarn Documentation](https://yarnpkg.com/getting-started)
-- [Vite Documentation](https://vitejs.dev/guide/)
+Special thanks to:
 
-**Happy coding! 🚀**
+- 🥷 **Console Ninja** team for inspiration
+- 🎨 **VS Code team** for the amazing extension API  
+- 💖 **Open Source community** for making this possible
+- 🚀 **All contributors** who make this project better
+
+---
+
+## 📚 Resources & Links
+
+- [VS Code Extension API Documentation](https://code.visualstudio.com/api)
+- [Extension Development Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)  
+- [Yarn Package Manager](https://yarnpkg.com/getting-started)
+- [Vite Build Tool](https://vitejs.dev/guide/)
+
+---
+
+<div align="center">
+
+**Made with ❤️ by MacroxW, for developers**
+
+[⭐ Star us on GitHub](https://github.com/yourusername/console-warrior) • [🚀 Try it now](https://marketplace.visualstudio.com/items?itemName=console-warrior) • [💬 Join the community](https://github.com/yourusername/console-warrior/discussions)
+
+</div>

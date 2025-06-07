@@ -1,16 +1,11 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
+import * as path from 'path';
 import * as vscode from 'vscode';
-import { ViteProjectManager } from './commands/viteManager';
-
-// Create a decoration type for text beside code
-const decorationType = vscode.window.createTextEditorDecorationType({
-	after: {
-		contentText: ' // Your text here',
-		color: '#888888',
-		fontStyle: 'italic'
-	}
-});
+import { NodeProjectManager } from './commands/nodeManager';
+import { LogManager } from './logManager';
+import { MenuManager } from './menus/menuManager';
+import { StatusBarManager } from './statusBar';
 
 // Function to open a specific welcome file
 async function openWelcomeFile() {
@@ -21,33 +16,103 @@ async function openWelcomeFile() {
 		// await vscode.window.showTextDocument(document);
 
 		// Option 2: Create a temporary file with welcome content
-		const welcomeContent = `Welcome to your VS Code Extension!
+		const welcomeContent = `# Welcome to your VS Code Extension
 
 This extension allows you to:
+
 - Add text beside your code lines
 - Clear decorations when you don't need them
 - Create and manage Vite projects
 
 Available commands:
+
 - Ctrl+Shift+P -> "Hello World" (Create Vite Project)
 - Ctrl+Shift+P -> "Add Text Beside Code"
 - Ctrl+Shift+P -> "Clear Text Beside Code"
 - Ctrl+Shift+P -> "Start Vite Dev Server"
 - Ctrl+Shift+P -> "Read Vite Logs"
 
-Happy coding! 🚀`;
+Happy coding! 🚀
+`;
 
 		const document = await vscode.workspace.openTextDocument({
 			content: welcomeContent,
 			language: 'markdown'
 		});
 		await vscode.window.showTextDocument(document);
-		
+
 		vscode.window.showInformationMessage('Extension activated! Welcome file opened.');
 	} catch (error) {
-		console.error('Error opening welcome file:', error);
+		vscode.window.showErrorMessage(`Error opening welcome file: ${error}`);
 	}
 }
+
+// Function to open the test project and start Node.js
+async function openTestProjectAndStartNode() {
+	try {
+		// Get the workspace folder path
+		const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+		if (!workspaceFolder) {
+			throw new Error('No workspace folder found');
+		}
+
+		// Debug: Check what workspace we're in
+		const workspacePath = workspaceFolder.uri.fsPath;
+
+		// Check if we're in the main console-warrior directory or a subdirectory
+		let consoleWarriorPath: string;
+		if (workspacePath.includes('console-warrior') && workspacePath.endsWith('console-warrior')) {
+			// We're in the main console-warrior directory
+			consoleWarriorPath = workspacePath;
+		} else if (workspacePath.includes('console-warrior')) {
+			// We're in a subdirectory, find the console-warrior root
+			const parts = workspacePath.split(path.sep);
+			const consoleWarriorIndex = parts.indexOf('console-warrior');
+			if (consoleWarriorIndex !== -1) {
+				consoleWarriorPath = parts.slice(0, consoleWarriorIndex + 1).join(path.sep);
+			} else {
+				throw new Error('Could not find console-warrior root directory');
+			}
+		} else {
+			throw new Error('Not in a console-warrior workspace');
+		}
+
+		// Construct the path to main.js
+		const mainJsAbsolutePath = path.join(consoleWarriorPath, 'projects', 'test-node-project', 'main.js');
+		const mainJsUri = vscode.Uri.file(mainJsAbsolutePath);
+
+		// Verify the file exists before trying to open it
+		try {
+			await vscode.workspace.fs.stat(mainJsUri);
+		} catch {
+			throw new Error(`Main.js file not found at: ${mainJsAbsolutePath}`);
+		}
+
+		// Open main.js file
+		const document = await vscode.workspace.openTextDocument(mainJsUri);
+		await vscode.window.showTextDocument(document);
+
+		// Wait a moment for the UI to settle
+		await new Promise<void>(resolve => {
+			(globalThis as any).setTimeout(() => {
+				resolve();
+			}, 1000);
+		});
+
+		// Start Node.js application automatically (for test project)
+		const testProjectPath = path.join(consoleWarriorPath, 'projects', 'test-node-project');
+		await NodeProjectManager.startNodeApplicationAt(testProjectPath);
+
+		vscode.window.showInformationMessage('🥷 Console Warrior is attached! Test project opened and Node.js started. Starting monitoring...');
+	} catch (error) {
+		vscode.window.showErrorMessage(`Error opening test project: ${error}`);
+		// Fallback to welcome file if main.js cannot be opened
+		await openWelcomeFile();
+	}
+}
+
+// Global instances
+let statusBarManager: StatusBarManager;
 
 // This method is called when the extension is activated
 // the extension is activated the very first time the command is executed
@@ -55,102 +120,121 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "helloworld" is now active!');
+	vscode.window.showInformationMessage('🥷 Console Warrior extension is now active!');
 
-	// Open a specific file when activating the extension
-	openWelcomeFile();
+	// Initialize modules
+	LogManager.initialize();
+	statusBarManager = new StatusBarManager();
+	MenuManager.initialize(statusBarManager);
 
-	// Command to add text beside the current line
-	const addTextDisposable = vscode.commands.registerCommand('helloworld.addTextBeside', () => {
-		const editor = vscode.window.activeTextEditor;
-		if (!editor) {
-			vscode.window.showErrorMessage('No active editor');
-			return;
-		}
+	// Activate status bar
+	statusBarManager.activate();
 
-		// Get the current cursor line
-		const position = editor.selection.active;
-		const line = position.line;
-		const lineText = editor.document.lineAt(line);
+	// Open test project and start Node.js when activating the extension (in development mode)
+	// Add a slight delay to ensure VS Code is fully loaded
+	setTimeout(async () => {
+		await openTestProjectAndStartNode();
+		// Auto-start Console Warrior monitoring after opening the project
+		setTimeout(() => {
+			statusBarManager.start();
+		}, 2000);
+	}, 1000);
 
-		// Create the decoration at the end of the line
-		const decoration = {
-			range: new vscode.Range(line, lineText.text.length, line, lineText.text.length),
-			renderOptions: {
-				after: {
-					contentText: ' ✨ Text added by extension!',
-					color: '#00ff00',
-					fontStyle: 'italic'
-				}
-			}
-		};
+	// Console Warrior Commands
 
-		// Apply the decoration
-		editor.setDecorations(decorationType, [decoration]);
-		vscode.window.showInformationMessage('Text added beside code!');
+	// Command to create a new Node.js project
+	const createProjectDisposable = vscode.commands.registerCommand('console-warrior.createProject', async () => {
+		await NodeProjectManager.createNodeProject();
 	});
 
-	// Command to clear decorations
-	const clearTextDisposable = vscode.commands.registerCommand('helloworld.clearTextBeside', () => {
-		const editor = vscode.window.activeTextEditor;
-		if (editor) {
-			editor.setDecorations(decorationType, []);
-			vscode.window.showInformationMessage('Text beside code cleared!');
-		}
+	// Command to start Node.js application
+	const startNodeDisposable = vscode.commands.registerCommand('console-warrior.startNode', async () => {
+		await NodeProjectManager.startNodeApplication();
 	});
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('helloworld.helloWorld', async () => {
-		// Create and open a Vite project using ViteProjectManager
-		await ViteProjectManager.createViteProject();
-	});
-
-	// Command to start Vite dev server
-	const startViteDisposable = vscode.commands.registerCommand('helloworld.startVite', async () => {
-		await ViteProjectManager.startViteDevServer();
-	});
-
-	// Command to read Vite logs
-	const readViteLogsDisposable = vscode.commands.registerCommand('helloworld.readViteLogs', () => {
-		ViteProjectManager.readViteLogs();
+	// Command to view Node.js logs
+	const viewLogsDisposable = vscode.commands.registerCommand('console-warrior.viewLogs', () => {
+		NodeProjectManager.viewNodeLogs();
 	});
 
 	// Command to capture and display logs
-	const captureLogsDisposable = vscode.commands.registerCommand('helloworld.captureAndDisplayLogs', async () => {
-		await ViteProjectManager.captureAndDisplayLogs();
+	const captureLogsDisposable = vscode.commands.registerCommand('console-warrior.captureLogs', async () => {
+		await LogManager.captureLogsInCurrentFile();
 	});
 
 	// Command to clear log decorations
-	const clearLogsDisposable = vscode.commands.registerCommand('helloworld.clearLogDecorations', () => {
-		const editor = vscode.window.activeTextEditor;
-		if (editor) {
-			ViteProjectManager.clearLogDecorations(editor.document.fileName);
+	const clearLogsDisposable = vscode.commands.registerCommand('console-warrior.clearLogs', () => {
+		LogManager.clearDecorations();
+	});
+
+	// Command to start log monitoring
+	const startMonitoringDisposable = vscode.commands.registerCommand('console-warrior.startMonitoring', async () => {
+		LogManager.startMonitoring();
+	});
+
+	// Command to stop log monitoring
+	const stopMonitoringDisposable = vscode.commands.registerCommand('console-warrior.stopMonitoring', async () => {
+		LogManager.stopMonitoring();
+	});
+
+	// Status bar menu command
+	const statusBarMenuDisposable = vscode.commands.registerCommand('console-warrior.statusBarMenu', async () => {
+		await MenuManager.showStatusBarMenu();
+	});
+
+	// Project menu command
+	const projectMenuDisposable = vscode.commands.registerCommand('console-warrior.projectMenu', async () => {
+		await MenuManager.showProjectMenu();
+	});
+
+	// Test command to manually show decorations
+	const testDecorationsDisposable = vscode.commands.registerCommand('console-warrior.testDecorations', async () => {
+		vscode.window.showInformationMessage('🥷 Testing Console Warrior decorations...');
+		await LogManager.captureLogsInCurrentFile();
+	});
+
+	// Auto-capture logs when opening JavaScript/TypeScript files
+	const onDidOpenTextDocument = vscode.workspace.onDidOpenTextDocument(async (document) => {
+		if ((document.fileName.endsWith('.js') || document.fileName.endsWith('.ts')) && statusBarManager) {
+			// Wait a moment for the document to be fully loaded
+			setTimeout(async () => {
+				await LogManager.captureLogsInCurrentFile();
+			}, 500);
 		}
 	});
 
-	// Command to generate mock logs for testing
-	const generateMockLogsDisposable = vscode.commands.registerCommand('helloworld.generateMockLogs', async () => {
-		const editor = vscode.window.activeTextEditor;
-		if (editor) {
-			await ViteProjectManager.generateMockLogs(editor.document.fileName);
+	// Auto-capture logs when switching between files
+	const onDidChangeActiveEditor = vscode.window.onDidChangeActiveTextEditor(async (editor) => {
+		if (editor && (editor.document.fileName.endsWith('.js') || editor.document.fileName.endsWith('.ts')) && statusBarManager) {
+			// Wait a moment for the editor to be fully loaded
+			setTimeout(async () => {
+				await LogManager.captureLogsInCurrentFile();
+			}, 500);
 		}
 	});
 
 	context.subscriptions.push(
-		disposable, 
-		addTextDisposable, 
-		clearTextDisposable, 
-		startViteDisposable, 
-		readViteLogsDisposable,
+		createProjectDisposable,
+		startNodeDisposable,
+		viewLogsDisposable,
 		captureLogsDisposable,
 		clearLogsDisposable,
-		generateMockLogsDisposable
+		startMonitoringDisposable,
+		stopMonitoringDisposable,
+		statusBarMenuDisposable,
+		projectMenuDisposable,
+		testDecorationsDisposable,
+		statusBarManager,
+		onDidOpenTextDocument,
+		onDidChangeActiveEditor
 	);
 }
 
 // This method is called when your extension is deactivated
 export function deactivate() {
 	// Cleanup code here if needed
+	LogManager.dispose();
+	if (statusBarManager) {
+		statusBarManager.dispose();
+	}
 }

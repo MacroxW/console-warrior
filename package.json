@@ -1,7 +1,7 @@
 {
-  "name": "helloworld",
-  "displayName": "HelloWorld Text Decorator & Vite Manager",
-  "description": "Add decorative text beside code lines and manage Vite development projects with ease",
+  "name": "console-warrior",
+  "displayName": "Console Warrior 🥷",
+  "description": "Free alternative to Console Ninja - Dynamic logging visualization for Node.js applications",
   "version": "1.0.0",
   "publisher": "MacroxW",
   "author": {
@@ -11,19 +11,23 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/first-vscode-extension"
+    "url": "https://github.com/your-username/console-warrior"
   },
   "keywords": [
-    "text-decoration",
-    "vite",
+    "console",
+    "logging",
+    "debugging",
+    "nodejs",
     "development",
     "productivity",
-    "code-annotation"
+    "console-ninja",
+    "dynamic-logging"
   ],
   "engines": {
     "vscode": "^1.100.0"
   },
   "categories": [
+    "Debuggers",
     "Other"
   ],
   "activationEvents": [],
@@ -31,36 +35,89 @@
   "contributes": {
     "commands": [
       {
-        "command": "helloworld.helloWorld",
-        "title": "Hello World"
+        "command": "console-warrior.createProject",
+        "title": "Create Node.js Test Project",
+        "category": "Console Warrior"
       },
       {
-        "command": "helloworld.addTextBeside",
-        "title": "Add Text Beside Code"
+        "command": "console-warrior.startNode",
+        "title": "Start Node.js Application",
+        "category": "Console Warrior"
       },
       {
-        "command": "helloworld.clearTextBeside",
-        "title": "Clear Text Beside Code"
+        "command": "console-warrior.viewLogs",
+        "title": "View Node.js Logs",
+        "category": "Console Warrior"
       },
       {
-        "command": "helloworld.startVite",
-        "title": "Start Vite Dev Server"
+        "command": "console-warrior.captureLogs",
+        "title": "Capture Console Logs",
+        "category": "Console Warrior"
       },
       {
-        "command": "helloworld.readViteLogs",
-        "title": "Read Vite Logs"
+        "command": "console-warrior.clearLogs",
+        "title": "Clear Log Decorations",
+        "category": "Console Warrior"
       },
       {
-        "command": "helloworld.captureAndDisplayLogs",
-        "title": "Capture and Display Logs"
+        "command": "console-warrior.generateMockLogs",
+        "title": "Generate Mock Logs",
+        "category": "Console Warrior"
       },
       {
-        "command": "helloworld.clearLogDecorations",
-        "title": "Clear Log Decorations"
+        "command": "console-warrior.startMonitoring",
+        "title": "Start Log Monitoring",
+        "category": "Console Warrior"
       },
       {
-        "command": "helloworld.generateMockLogs",
-        "title": "Generate Mock Logs for Testing"
+        "command": "console-warrior.statusBarMenu",
+        "title": "Console Warrior Menu"
+      },
+      {
+        "command": "console-warrior.projectMenu",
+        "title": "Console Warrior Projects"
+      },
+      {
+        "command": "console-warrior.testDecorations",
+        "title": "Test Console Warrior Decorations",
+        "category": "Console Warrior"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "console-warrior.captureLogs",
+        "key": "ctrl+shift+l",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "console-warrior.clearLogs",
+        "key": "ctrl+shift+k",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "console-warrior.statusBarMenu",
+        "key": "ctrl+shift+w",
+        "when": "editorTextFocus"
+      }
+    ],
+    "colors": [
+      {
+        "id": "consoleWarrior.logOutput",
+        "description": "Console Warrior log output text color",
+        "defaults": {
+          "dark": "#00ff88",
+          "light": "#008844",
+          "highContrast": "#00ff88"
+        }
+      },
+      {
+        "id": "consoleWarrior.logBackground",
+        "description": "Console Warrior log background color",
+        "defaults": {
+          "dark": "#00ff8810",
+          "light": "#00884410",
+          "highContrast": "#00ff8810"
+        }
       }
     ]
   },
@@ -70,7 +127,12 @@
     "watch": "tsc -watch -p ./",
     "pretest": "yarn compile && yarn lint",
     "lint": "eslint src",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "test:unit": "vscode-test --include src/test/unit/**/*.test.ts",
+    "test:integration": "vscode-test --include src/test/integration/**/*.test.ts",
+    "test:all": "yarn test",
+    "test:coverage": "vscode-test --coverage",
+    "test:watch": "vscode-test --watch"
   },
   "devDependencies": {
     "@types/vscode": "^1.100.0",
