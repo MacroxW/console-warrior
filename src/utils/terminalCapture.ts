@@ -14,6 +14,7 @@ export class TerminalCapture {
     private static fileWatcher: NodeJS.Timeout | undefined;
     private static onLogCaptured: ((logs: LogEntry[]) => void) | undefined;
     private static lastProcessedIndex: number = -1;
+    private static lastFileModTime: number = 0;
 
     public static initialize(workspaceFolder: string): void {
         // Look for the log file in the test project directory
@@ -46,6 +47,16 @@ export class TerminalCapture {
         }
 
         try {
+            const stats = fs.statSync(this.logOutputFile);
+            const currentModTime = stats.mtime.getTime();
+            
+            // Check if file has been modified since last read
+            if (currentModTime <= this.lastFileModTime) {
+                return;
+            }
+            
+            this.lastFileModTime = currentModTime;
+            
             const content = fs.readFileSync(this.logOutputFile, 'utf8');
             if (!content.trim()) {
                 return;
@@ -53,6 +64,12 @@ export class TerminalCapture {
             console.log('[ConsoleWarrior] Log file read, content length:', content.length);
 
             const logs: LogEntry[] = JSON.parse(content);
+
+            // If this is a fresh log file (after recompilation), reset index
+            if (logs.length > 0 && logs[0].index === 0 && this.lastProcessedIndex > 0) {
+                console.log('[ConsoleWarrior] Detected fresh log file, resetting index');
+                this.lastProcessedIndex = -1;
+            }
 
             // Only process new logs
             const newLogs = logs.filter(log => log.index > this.lastProcessedIndex);

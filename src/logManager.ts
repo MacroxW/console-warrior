@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 import { TerminalCapture } from './utils/terminalCapture';
 
 interface LogEntry {
@@ -15,6 +16,8 @@ export class LogManager {
     private static isMonitoring: boolean = false;
     private static readonly logDecorations: Map<string, vscode.DecorationOptions[]> = new Map();
     private static realTimeLogs: LogEntry[] = [];
+    private static fileWatcher: vscode.FileSystemWatcher | undefined;
+    private static readonly documentChangeListener: vscode.Disposable[] = [];
 
     public static initialize(): void {
         this.outputChannel = vscode.window.createOutputChannel('Console Warrior');
@@ -33,6 +36,10 @@ export class LogManager {
         if (workspaceFolder) {
             TerminalCapture.initialize(workspaceFolder.uri.fsPath);
         }
+
+        // Setup file watching for source code changes
+        this.setupFileWatching();
+        this.setupDocumentChangeListening();
     }
 
     public static startMonitoring(): void {
@@ -47,6 +54,81 @@ export class LogManager {
         this.outputChannel.appendLine('⏸️ Console Warrior monitoring paused');
         console.log('[ConsoleWarrior] Monitoring paused');
         TerminalCapture.stopCapturing();
+    }
+
+    private static setupFileWatching(): void {
+        // Watch for changes to JavaScript/TypeScript files that might affect log output
+        const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+        if (!workspaceFolder) {
+            return;
+        }
+
+        // Create file watcher for JS/TS files in the test project
+        const pattern = new vscode.RelativePattern(workspaceFolder, '**/test-node-project/**/*.{js,ts}');
+        this.fileWatcher = vscode.workspace.createFileSystemWatcher(pattern);
+
+        this.fileWatcher.onDidChange(uri => {
+            if (this.isMonitoring) {
+                console.log('[ConsoleWarrior] File changed:', uri.fsPath);
+                this.outputChannel.appendLine(`📁 File changed: ${path.basename(uri.fsPath)}`);
+                // Clear existing logs and decorations for the changed file
+                this.clearDecorations(uri.fsPath);
+                this.realTimeLogs = []; // Clear real-time logs to start fresh
+                // Trigger decoration update after a brief delay to allow file to stabilize
+                setTimeout(() => {
+                    this.updateDecorations();
+                }, 1000);
+            }
+        });
+
+        this.fileWatcher.onDidCreate(uri => {
+            if (this.isMonitoring) {
+                console.log('[ConsoleWarrior] File created:', uri.fsPath);
+                this.outputChannel.appendLine(`📁 File created: ${path.basename(uri.fsPath)}`);
+            }
+        });
+
+        this.fileWatcher.onDidDelete(uri => {
+            if (this.isMonitoring) {
+                console.log('[ConsoleWarrior] File deleted:', uri.fsPath);
+                this.outputChannel.appendLine(`📁 File deleted: ${path.basename(uri.fsPath)}`);
+                this.clearDecorations(uri.fsPath);
+            }
+        });
+    }
+
+    private static setupDocumentChangeListening(): void {
+        // Listen for document save events to refresh decorations
+        const onDidSaveDocument = vscode.workspace.onDidSaveTextDocument(document => {
+            if (this.isMonitoring && (document.fileName.endsWith('.js') || document.fileName.endsWith('.ts'))) {
+                console.log('[ConsoleWarrior] Document saved:', document.fileName);
+                this.outputChannel.appendLine(`💾 Document saved: ${path.basename(document.fileName)}`);
+                // Clear logs for this file and refresh
+                this.clearDecorations(document.fileName);
+                setTimeout(() => {
+                    this.updateDecorations();
+                }, 500);
+            }
+        });
+
+        // Listen for active editor changes to ensure decorations are shown
+        const onDidChangeActiveEditor = vscode.window.onDidChangeActiveTextEditor(editor => {
+            if (this.isMonitoring && editor && (editor.document.fileName.endsWith('.js') || editor.document.fileName.endsWith('.ts'))) {
+                console.log('[ConsoleWarrior] Active editor changed:', editor.document.fileName);
+                // Apply existing decorations for this file
+                const existingDecorations = this.logDecorations.get(editor.document.fileName);
+                if (existingDecorations) {
+                    editor.setDecorations(this.decorationType, existingDecorations);
+                } else {
+                    // Update decorations for the newly opened file
+                    setTimeout(() => {
+                        this.updateDecorations();
+                    }, 300);
+                }
+            }
+        });
+
+        this.documentChangeListener.push(onDidSaveDocument, onDidChangeActiveEditor);
     }
 
     private static startRealTimeCapture(): void {
@@ -349,5 +431,14 @@ export class LogManager {
         this.outputChannel.dispose();
         this.decorationType.dispose();
         TerminalCapture.dispose();
+        
+        // Dispose file watcher
+        if (this.fileWatcher) {
+            this.fileWatcher.dispose();
+            this.fileWatcher = undefined;
+        }
+        
+        // Dispose document change listeners
+        this.documentChangeListener.forEach(listener => listener.dispose());
     }
 }

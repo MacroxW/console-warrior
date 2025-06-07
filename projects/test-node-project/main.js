@@ -129,7 +129,7 @@ function calculateSum(a, b) {
 }
 
 // Error and warning logs
-console.error('This is an error message');
+console.error('This is an !error message');
 console.warn('This is a warning message');
 console.info('This is an info message');
 
@@ -166,7 +166,7 @@ async function main() {
     }
 
     // Loop with logs
-    console.log('Counting to 5:');
+    console.log('tasdo 6:');
     for (let i = 1; i <= 5; i++) {
         console.log(`Count: ${i}`);
     }
