@@ -1,0 +1,12 @@
+{
+  "name": "console-warrior-test-project",
+  "version": "1.0.0",
+  "description": "Test project for Console Warrior extension",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT"
+}

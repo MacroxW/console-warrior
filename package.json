@@ -2,7 +2,7 @@
   "name": "console-warrior",
   "displayName": "Console Warrior 🥷",
   "description": "Free alternative to Console Ninja - Dynamic logging visualization for Node.js applications",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "publisher": "MacroxW",
   "author": {
     "name": "Marcos Wendy",
@@ -11,7 +11,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/console-warrior"
+    "url": "https://github.com/MacroxW/console-warrior"
   },
   "keywords": [
     "console",
@@ -35,120 +35,71 @@
   "contributes": {
     "commands": [
       {
-        "command": "console-warrior.createProject",
-        "title": "Create Node.js Test Project",
-        "category": "Console Warrior"
+        "command": "console-warrior.run",
+        "title": "Run File with Console Warrior",
+        "category": "Console Warrior",
+        "icon": "$(play)"
       },
       {
-        "command": "console-warrior.startNode",
-        "title": "Start Node.js Application",
-        "category": "Console Warrior"
+        "command": "console-warrior.runProject",
+        "title": "Run Project with Console Warrior",
+        "category": "Console Warrior",
+        "icon": "$(folder)"
       },
       {
-        "command": "console-warrior.viewLogs",
-        "title": "View Node.js Logs",
-        "category": "Console Warrior"
+        "command": "console-warrior.start",
+        "title": "Start Watching",
+        "category": "Console Warrior",
+        "icon": "$(eye)"
       },
       {
-        "command": "console-warrior.captureLogs",
-        "title": "Capture Console Logs",
-        "category": "Console Warrior"
+        "command": "console-warrior.stop",
+        "title": "Stop Watching",
+        "category": "Console Warrior",
+        "icon": "$(eye-closed)"
       },
       {
-        "command": "console-warrior.clearLogs",
-        "title": "Clear Log Decorations",
-        "category": "Console Warrior"
+        "command": "console-warrior.clear",
+        "title": "Clear Logs",
+        "category": "Console Warrior",
+        "icon": "$(trash)"
       },
       {
-        "command": "console-warrior.generateMockLogs",
-        "title": "Generate Mock Logs",
-        "category": "Console Warrior"
+        "command": "console-warrior.refresh",
+        "title": "Refresh Decorations",
+        "category": "Console Warrior",
+        "icon": "$(refresh)"
       },
       {
-        "command": "console-warrior.startMonitoring",
-        "title": "Start Log Monitoring",
-        "category": "Console Warrior"
+        "command": "console-warrior.showOutput",
+        "title": "Show Output",
+        "category": "Console Warrior",
+        "icon": "$(output)"
       },
       {
-        "command": "console-warrior.statusBarMenu",
-        "title": "Console Warrior Menu"
-      },
-      {
-        "command": "console-warrior.projectMenu",
-        "title": "Console Warrior Projects"
-      },
-      {
-        "command": "console-warrior.testDecorations",
-        "title": "Test Console Warrior Decorations",
-        "category": "Console Warrior"
-      },
-      {
-        "command": "console-warrior.showLogJson",
-        "title": "View Complete Log JSON File",
-        "category": "Console Warrior"
-      },
-      {
-        "command": "console-warrior.copyLogValue",
-        "title": "Copy Log Value",
-        "category": "Console Warrior"
-      },
-      {
-        "command": "console-warrior.showLogDetails",
-        "title": "Show Log Details",
-        "category": "Console Warrior"
+        "command": "console-warrior.showMenu",
+        "title": "Console Warrior Menu",
+        "category": "Console Warrior",
+        "icon": "$(menu)"
       }
     ],
     "keybindings": [
       {
-        "command": "console-warrior.captureLogs",
-        "key": "ctrl+shift+l",
-        "when": "editorTextFocus"
+        "command": "console-warrior.run",
+        "key": "ctrl+shift+r",
+        "when": "editorTextFocus && resourceExtname == .js"
       },
       {
-        "command": "console-warrior.clearLogs",
+        "command": "console-warrior.clear",
         "key": "ctrl+shift+k",
         "when": "editorTextFocus"
       },
       {
-        "command": "console-warrior.statusBarMenu",
+        "command": "console-warrior.showMenu",
         "key": "ctrl+shift+w",
-        "when": "editorTextFocus"
-      },
-      {
-        "command": "console-warrior.showLogJson",
-        "key": "ctrl+shift+j",
-        "when": "editorTextFocus"
-      },
-      {
-        "command": "console-warrior.copyLogValue",
-        "key": "ctrl+shift+c",
-        "when": "editorTextFocus"
-      },
-      {
-        "command": "console-warrior.showLogDetails",
-        "key": "ctrl+shift+d",
         "when": "editorTextFocus"
       }
     ],
-    "menus": {
-      "editor/context": [
-        {
-          "command": "console-warrior.copyLogValue",
-          "when": "editorTextFocus && resourceExtname == '.js'",
-          "group": "consoleWarrior@1"
-        },
-        {
-          "command": "console-warrior.showLogDetails",
-          "when": "editorTextFocus && resourceExtname == '.js'",
-          "group": "consoleWarrior@2"
-        },
-        {
-          "command": "console-warrior.showLogJson",
-          "when": "editorTextFocus && resourceExtname == '.js'",
-          "group": "consoleWarrior@3"
-        }
-      ]
-    },
     "colors": [
       {
         "id": "consoleWarrior.logOutput",
@@ -167,31 +118,48 @@
           "light": "#00884410",
           "highContrast": "#00ff8810"
         }
+      },
+      {
+        "id": "consoleWarrior.warnOutput",
+        "description": "Console Warrior warning output text color",
+        "defaults": {
+          "dark": "#ffcc00",
+          "light": "#cc9900",
+          "highContrast": "#ffcc00"
+        }
+      },
+      {
+        "id": "consoleWarrior.errorOutput",
+        "description": "Console Warrior error output text color",
+        "defaults": {
+          "dark": "#ff4444",
+          "light": "#cc0000",
+          "highContrast": "#ff4444"
+        }
       }
     ]
   },
   "scripts": {
-    "vscode:prepublish": "yarn compile",
+    "vscode:prepublish": "pnpm compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "pretest": "yarn compile && yarn lint",
+    "pretest": "pnpm compile && pnpm lint",
     "lint": "eslint src",
     "test": "vscode-test",
-    "test:unit": "vscode-test --include src/test/unit/**/*.test.ts",
-    "test:integration": "vscode-test --include src/test/integration/**/*.test.ts",
-    "test:all": "yarn test",
-    "test:coverage": "vscode-test --coverage",
-    "test:watch": "vscode-test --watch"
+    "test:loader": "mocha loader/__tests__/loader.test.js"
   },
   "devDependencies": {
-    "@types/vscode": "^1.100.0",
+    "@types/glob": "^9.0.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
+    "@types/vscode": "^1.100.0",
     "@typescript-eslint/eslint-plugin": "^8.31.1",
     "@typescript-eslint/parser": "^8.31.1",
-    "eslint": "^9.25.1",
-    "typescript": "^5.8.3",
     "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.5.2"
+    "@vscode/test-electron": "^2.5.2",
+    "eslint": "^9.25.1",
+    "glob": "^13.0.0",
+    "mocha": "^11.7.5",
+    "typescript": "^5.8.3"
   }
 }
