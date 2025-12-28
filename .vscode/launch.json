@@ -11,7 +11,7 @@
 			"request": "launch",
 			"args": [
 				"--extensionDevelopmentPath=${workspaceFolder}",
-				"${workspaceFolder}/projects/test-node-project"
+				"${workspaceFolder}/projects/test-vite-project"
 			],
 			"outFiles": [
 				"${workspaceFolder}/out/**/*.js"

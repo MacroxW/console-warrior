@@ -4,7 +4,7 @@
 
 A powerful VS Code extension that brings dynamic log visualization directly to your code - like Console Ninja, but completely open source and free! See your `console.log` outputs right beside your code in real-time, without switching between your editor and browser console.
 
-> 🎯 **Mission**: Democratize advanced logging tools for every developer, regardless of budget.
+> 🎯 **Mission**: End my project! -- I prefer to make my own "console ninja" rather than pay for premium features
 
 ## Why Console Warrior?
 
@@ -83,13 +83,13 @@ A powerful VS Code extension that brings dynamic log visualization directly to y
 2. **Install dependencies:**
 
    ```bash
-   yarn install
+   pnpm install
    ```
 
 3. **Launch in development mode:**
 
    ```bash
-   yarn compile
+   pnpm compile
    # Press F5 in VS Code to open extension host
    ```
 
@@ -169,15 +169,15 @@ function greetUser(name) {
 
 ## 🆚 Console Warrior vs Alternatives
 
-| Feature | Console Warrior | Console Ninja | Browser DevTools |
-|---------|----------------|---------------|------------------|
-| **Price** | 🆓 **Free Forever** | 💰 Paid subscription | 🆓 Free |
-| **In-Editor Logs** | ✅ Real-time | ✅ Real-time | ❌ Separate window |
-| **Open Source** | ✅ MIT License | ❌ Proprietary | ❌ Browser-specific |
-| **No Setup** | ✅ Zero config | ✅ Easy setup | ⚠️ Manual steps |
-| **Offline Work** | ✅ Always works | ✅ Works offline | ✅ Browser dependent |
-| **Custom Extensions** | ✅ Community driven | ❌ Limited | ❌ No customization |
-| **Multi-Framework** | ✅ Universal | ✅ Multiple | ⚠️ Framework dependent |
+| Feature               | Console Warrior    | Console Ninja       | Browser DevTools      |
+| --------------------- | ------------------ | ------------------- | --------------------- |
+| **Price**             | 🆓 **Free Forever** | 💰 Paid subscription | 🆓 Free                |
+| **In-Editor Logs**    | ✅ Real-time        | ✅ Real-time         | ❌ Separate window     |
+| **Open Source**       | ✅ MIT License      | ❌ Proprietary       | ❌ Browser-specific    |
+| **No Setup**          | ✅ Zero config      | ✅ Easy setup        | ⚠️ Manual steps        |
+| **Offline Work**      | ✅ Always works     | ✅ Works offline     | ✅ Browser dependent   |
+| **Custom Extensions** | ✅ Community driven | ❌ Limited           | ❌ No customization    |
+| **Multi-Framework**   | ✅ Universal        | ✅ Multiple          | ⚠️ Framework dependent |
 
 **🎯 Our Mission**: Bring Console Ninja's amazing UX to everyone, for free!
 
@@ -185,15 +185,15 @@ function greetUser(name) {
 
 All commands are accessible through the Command Palette (`Ctrl+Shift+P` or `Cmd+Shift+P`):
 
-| Command | Description | Status |
-|---------|-------------|--------|
+| Command                    | Description                                                | Status   |
+| -------------------------- | ---------------------------------------------------------- | -------- |
 | `Capture and Display Logs` | 🎯 Parse console.log statements and show output beside code | ✅ Active |
-| `Clear Log Decorations` | 🧹 Remove all log decorations from the current file | ✅ Active |
-| `Generate Mock Logs` | 🎭 Create test log entries for demonstration | ✅ Active |
-| `Add Text Beside Code` | ✏️ Add decorative text at the end of the current line | ✅ Active |
-| `Clear Text Beside Code` | 🗑️ Remove all text decorations from the editor | ✅ Active |
-| `Start Vite Dev Server` | 🚀 Launch Vite development server in terminal | ✅ Active |
-| `Read Vite Logs` | 📖 Focus on Vite terminal to view logs | ✅ Active |
+| `Clear Log Decorations`    | 🧹 Remove all log decorations from the current file         | ✅ Active |
+| `Generate Mock Logs`       | 🎭 Create test log entries for demonstration                | ✅ Active |
+| `Add Text Beside Code`     | ✏️ Add decorative text at the end of the current line       | ✅ Active |
+| `Clear Text Beside Code`   | 🗑️ Remove all text decorations from the editor              | ✅ Active |
+| `Start Vite Dev Server`    | 🚀 Launch Vite development server in terminal               | ✅ Active |
+| `Read Vite Logs`           | 📖 Focus on Vite terminal to view logs                      | ✅ Active |
 
 > 💡 **Tip**: Most commands work immediately without configuration!
 
