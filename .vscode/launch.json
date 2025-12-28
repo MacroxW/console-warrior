@@ -1,3 +1,7 @@
+// A launch configuration that compiles the extension and then opens it inside a new window
+// Use IntelliSense to learn about possible attributes.
+// Hover to view descriptions of existing attributes.
+// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
 {
 	"version": "0.2.0",
 	"configurations": [
@@ -7,12 +11,12 @@
 			"request": "launch",
 			"args": [
 				"--extensionDevelopmentPath=${workspaceFolder}",
-				"${workspaceFolder}/test-project"
+				"${workspaceFolder}/projects/test-node-project"
 			],
 			"outFiles": [
 				"${workspaceFolder}/out/**/*.js"
 			],
-			"preLaunchTask": "pnpm: compile",
+			"preLaunchTask": "npm: compile",
 			"skipFiles": [
 				"<node_internals>/**"
 			]
@@ -23,12 +27,38 @@
 			"request": "launch",
 			"args": [
 				"--extensionDevelopmentPath=${workspaceFolder}",
-				"--extensionTestsPath=${workspaceFolder}/out/test/suite"
+				"--extensionTestsPath=${workspaceFolder}/out/test"
 			],
 			"outFiles": [
 				"${workspaceFolder}/out/test/**/*.js"
 			],
-			"preLaunchTask": "pnpm: compile"
+			"preLaunchTask": "npm: compile"
+		},
+		{
+			"name": "Unit Tests Only",
+			"type": "extensionHost",
+			"request": "launch",
+			"args": [
+				"--extensionDevelopmentPath=${workspaceFolder}",
+				"--extensionTestsPath=${workspaceFolder}/out/test/unit"
+			],
+			"outFiles": [
+				"${workspaceFolder}/out/test/unit/**/*.js"
+			],
+			"preLaunchTask": "npm: compile"
+		},
+		{
+			"name": "Integration Tests Only",
+			"type": "extensionHost",
+			"request": "launch",
+			"args": [
+				"--extensionDevelopmentPath=${workspaceFolder}",
+				"--extensionTestsPath=${workspaceFolder}/out/test/integration"
+			],
+			"outFiles": [
+				"${workspaceFolder}/out/test/integration/**/*.js"
+			],
+			"preLaunchTask": "npm: compile"
 		}
 	]
 }
